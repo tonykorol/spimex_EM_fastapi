@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from fastapi import Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,8 +21,8 @@ async def dynamics(
         end_date: date = Query(default=datetime.today().date()),
         session: AsyncSession = Depends(get_async_session)
 ):
-    # if start_date > end_date:
-    #     raise ValueError('start_date must be less than end_date')
+    if start_date >= end_date:
+        raise HTTPException(status_code=400, detail="start_date must be less than end_date")
 
     cache_key = await generate_cache_key(request.method, request.url)
     result = await get_cache(cache_key)
