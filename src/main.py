@@ -8,6 +8,7 @@ from src.api.v1.handlers.last_trading_dates import router as ltd_router
 from src.api.v1.handlers.dynamics import router as dyn_router
 from src.api.v1.handlers.trading_results import router as tr_router
 from src.logging_config import setup_logging
+from src.tasks.scheduler import start_scheduler
 
 setup_logging()
 
@@ -15,6 +16,7 @@ setup_logging()
 async def lifespan(app: FastAPI):
     logging.info("Start app")
     await redis_client.connect()
+    start_scheduler()
     yield
     await redis_client.clear()
     await redis_client.close()

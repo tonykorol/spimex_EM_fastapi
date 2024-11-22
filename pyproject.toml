@@ -19,6 +19,7 @@ fastapi = "^0.115.5"
 pydantic = "^2.9.2"
 uvicorn = "^0.32.0"
 redis = "^5.2.0"
+apscheduler = "^3.10.4"
 
 
 [build-system]
