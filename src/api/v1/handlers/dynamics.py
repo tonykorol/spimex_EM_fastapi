@@ -4,7 +4,7 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi import Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.cache.cache_services import generate_cache_key, get_cache, set_cache
+from src.cache.cache_services import generate_cache_key, get_cache, set_cache, get_cache_or_cache_key
 from src.database.database import get_async_session
 from src.schemas.schemas import SpimexTradingResultListSchema
 from src.api.v1.services.dynamics import get_dynamics
@@ -24,8 +24,7 @@ async def dynamics(
     if start_date >= end_date:
         raise HTTPException(status_code=400, detail="start_date must be less than end_date")
 
-    cache_key = await generate_cache_key(request.method, request.url)
-    result = await get_cache(cache_key)
+    result, cache_key = await get_cache_or_cache_key(request.method, request.url)
     if result is None:
         result = await get_dynamics(
             oil_id,
