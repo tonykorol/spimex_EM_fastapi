@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 from typing import Optional, List, Union
@@ -33,8 +34,6 @@ class RedisClient:
 
     async def set_cache(self, key: str, data: List[Union[SpimexTradingResults, str]]) -> None:
         if data:
-            # if isinstance(data.get('results')[0], SpimexTradingResults):
-            #     data = [obj.to_dict() for obj in data]
             await self.redis.set(key, json.dumps(data))
 
     async def clear_cache(self) -> None:
@@ -43,7 +42,8 @@ class RedisClient:
 
     @staticmethod
     async def generate_cache_key(method: str, url: str) -> str:
-        return f"{method}:{url}"
+        key = f"{method}:{url}"
+        return hashlib.sha256(key.encode()).hexdigest()
 
     async def get_cache_or_cache_key(self, method: str, url: str) -> Union[List[dict], str]:
         key = await self.generate_cache_key(method, url)
@@ -53,10 +53,10 @@ class RedisClient:
 async def update_cache_in_background(redis_client: RedisClient, key: str, data) -> None:
     await redis_client.set_cache(key, data)
 
+
 from src.config import REDIS_HOST, REDIS_PORT
 
 redis_client = RedisClient(REDIS_HOST, REDIS_PORT)
 
 async def get_redis_client():
     return redis_client
-
