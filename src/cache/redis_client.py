@@ -4,7 +4,6 @@ import logging
 from typing import Optional, List, Union
 
 import redis.asyncio as redis
-from fastapi import Depends
 
 from src.models.spimex import SpimexTradingResults
 
@@ -16,29 +15,41 @@ class RedisClient:
         self.redis = None
 
     async def connect(self):
-        self.redis = await redis.from_url(f"redis://{self.host}:{self.port}")
-        logging.info("Connected to redis")
+        try:
+            self.redis = await redis.from_url(f"redis://{self.host}:{self.port}")
+            await self.redis.ping()
+            logging.info("Connected to redis")
+        except Exception as e:
+            self.redis = None
+            logging.error(f"Ошибка при подключении к Redis: {e}")
 
     async def close(self):
         if self.redis:
             await self.redis.close()
 
-    async def clear(self):
-        await self.redis.flushdb()
-
     async def get_cache(self, key) -> Optional[List[dict]]:
-        cache = await self.redis.get(key)
-        if cache is None:
-            return None
-        return json.loads(cache)
+        try:
+            cache = await self.redis.get(key)
+            if cache is None:
+                return None
+            return json.loads(cache)
+        except Exception as e:
+            logging.error(f"Ошибка при получении данных из Redis: {e}")
 
     async def set_cache(self, key: str, data: List[Union[SpimexTradingResults, str]]) -> None:
-        if data:
-            await self.redis.set(key, json.dumps(data))
+        try:
+            if data:
+                await self.redis.set(key, json.dumps(data))
+        except Exception as e:
+            logging.error(f"Ошибка при установке кэша в Redis: {e}")
 
     async def clear_cache(self) -> None:
-        if self.redis:
-            await self.redis.flushdb()
+        try:
+            if self.redis:
+                await self.redis.flushdb()
+                logging.info("Cache cleared")
+        except Exception as e:
+            logging.error(f"Ошибка при очистке Redis: {e}")
 
     @staticmethod
     async def generate_cache_key(method: str, url: str) -> str:
@@ -55,7 +66,6 @@ async def update_cache_in_background(redis_client: RedisClient, key: str, data) 
 
 
 from src.config import REDIS_HOST, REDIS_PORT
-
 redis_client = RedisClient(REDIS_HOST, REDIS_PORT)
 
 async def get_redis_client():

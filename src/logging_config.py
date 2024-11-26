@@ -2,7 +2,6 @@ import logging
 
 
 def setup_logging():
-    # logging.basicConfig(filename="app.log")
     file_handler=logging.FileHandler('app.log')
 
     console_handler = logging.StreamHandler()

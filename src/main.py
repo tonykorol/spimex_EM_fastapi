@@ -14,13 +14,13 @@ setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logging.info("Start app")
+    logging.info("Application start")
     await redis_client.connect()
     start_scheduler()
     yield
-    await redis_client.clear()
+    await redis_client.clear_cache()
     await redis_client.close()
-    logging.info("Stop app")
+    logging.info("Application stop")
 
 app = FastAPI(lifespan=lifespan)
 
