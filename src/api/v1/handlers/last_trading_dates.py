@@ -26,5 +26,4 @@ async def last_trading_dates(
         result = await get_last_trading_dates(count, session)
         result = {"dates": result}
         background_tasks.add_task(update_cache_in_background, redis_client, cache_key, result)
-        # await set_cache(cache_key, result)
     return result

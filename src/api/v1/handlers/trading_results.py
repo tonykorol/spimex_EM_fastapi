@@ -23,5 +23,4 @@ async def trading_results(
         result = await get_dynamics(oil_id, delivery_type_id, delivery_basis_id, session)
         result = {"results": result}
         background_tasks.add_task(update_cache_in_background, redis_client, cache_key, result)
-        # await set_cache(cache_key, result)
     return result
