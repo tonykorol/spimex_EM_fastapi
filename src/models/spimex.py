@@ -34,7 +34,7 @@ class SpimexTradingResults(Base):
             "volume": self.volume,
             "total": self.total,
             "count": self.count,
-            "date": str(self.date),
-            "created_on": str(self.created_on),
-            "updated_on": str(self.updated_on),
+            "date": self.date.isoformat(),
+            "created_on": self.created_on.isoformat(),
+            "updated_on": self.updated_on.isoformat(),
         }

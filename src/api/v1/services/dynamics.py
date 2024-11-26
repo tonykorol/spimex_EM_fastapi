@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 from typing import List
 
 from sqlalchemy import select
@@ -31,5 +31,6 @@ async def get_dynamics(
 
     result = await session.execute(query)
     result = result.unique().scalars().all()
+    result = [el.to_dict() for el in result]
 
     return result

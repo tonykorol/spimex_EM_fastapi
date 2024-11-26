@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas.schemas import SpimexLastTradingDatesListSchema
+from src.api.v1.schemas.schemas import SpimexLastTradingDatesListSchema
 from src.models.spimex import SpimexTradingResults
 
 
