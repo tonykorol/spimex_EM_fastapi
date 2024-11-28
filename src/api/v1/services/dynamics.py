@@ -8,6 +8,8 @@ from src.models.spimex import SpimexTradingResults
 
 
 async def get_dynamics(
+        page: int,
+        size: int,
         oil_id: str,
         delivery_type_id: str,
         delivery_basis_id: str,
@@ -22,6 +24,9 @@ async def get_dynamics(
     в указанный период времени и по заданным критериям (идентификаторы нефти,
     типа доставки и базы доставки).
     """
+    offset_min = page * size
+    offset_max = (page + 1) * size
+
     query = (select(SpimexTradingResults).order_by(SpimexTradingResults.date))
 
     if start_date and end_date:
@@ -39,4 +44,4 @@ async def get_dynamics(
     result = result.unique().scalars().all()
     result = [el.to_dict() for el in result]
 
-    return result
+    return result[offset_min:offset_max]

@@ -24,4 +24,4 @@ class SpimexTradingResultListSchema(BaseModel):
 
 
 class SpimexLastTradingDatesListSchema(BaseModel):
-    dates: list[str]
+    dates: list[date]

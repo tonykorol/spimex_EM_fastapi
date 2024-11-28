@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, BackgroundTasks
+from fastapi import APIRouter, Depends, Request, BackgroundTasks, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.cache.redis_client import RedisClient, get_redis_client, update_cache_in_background
@@ -12,9 +12,11 @@ router = APIRouter(prefix="/trading_results")
 async def trading_results(
         request: Request,
         background_tasks: BackgroundTasks,
-        oil_id: str,
-        delivery_type_id: str,
-        delivery_basis_id: str,
+        page: int = Query(ge=0, default=0),
+        size: int = Query(ge=1, le=100, default=100),
+        oil_id: str = Query(default=None),
+        delivery_type_id: str = Query(default=None),
+        delivery_basis_id: str = Query(default=None),
         session: AsyncSession = Depends(get_async_session),
         redis_client: RedisClient = Depends(get_redis_client),
 ):
@@ -27,7 +29,7 @@ async def trading_results(
     """
     result, cache_key = await redis_client.get_cache_or_cache_key(request.method, request.url)
     if result is None:
-        result = await get_dynamics(oil_id, delivery_type_id, delivery_basis_id, session)
+        result = await get_dynamics(page, size, oil_id, delivery_type_id, delivery_basis_id, session)
         result = {"results": result}
         background_tasks.add_task(update_cache_in_background, redis_client, cache_key, result)
     return result

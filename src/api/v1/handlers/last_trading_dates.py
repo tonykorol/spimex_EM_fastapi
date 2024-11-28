@@ -14,6 +14,8 @@ router = APIRouter(prefix="/last_trading_dates")
 async def last_trading_dates(
         request: Request,
         background_tasks: BackgroundTasks,
+        page: int = Query(ge=0, default=0),
+        size: int = Query(ge=1, le=100, default=100),
         count: int = Query(ge=1, default=10),
         session: AsyncSession = Depends(get_async_session),
         redis_client: RedisClient = Depends(get_redis_client),
@@ -27,7 +29,7 @@ async def last_trading_dates(
     """
     result, cache_key = await redis_client.get_cache_or_cache_key(request.method, request.url)
     if result is None:
-        result = await get_last_trading_dates(count, session)
+        result = await get_last_trading_dates(page, size, count, session)
         result = {"dates": result}
         background_tasks.add_task(update_cache_in_background, redis_client, cache_key, result)
     return result

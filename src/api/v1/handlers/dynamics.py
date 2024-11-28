@@ -15,6 +15,8 @@ router = APIRouter(prefix='/dynamics')
 async def dynamics(
         request: Request,
         background_tasks: BackgroundTasks,
+        page: int = Query(ge=0, default=0),
+        size: int = Query(ge=1, le=100, default=100),
         oil_id: str = Query(default=None),
         delivery_type_id: str = Query(default=None),
         delivery_basis_id: str = Query(default=None),
@@ -38,6 +40,8 @@ async def dynamics(
     result, cache_key = await redis_client.get_cache_or_cache_key(request.method, request.url)
     if result is None:
         result = await get_dynamics(
+            page,
+            size,
             oil_id,
             delivery_type_id,
             delivery_basis_id,
