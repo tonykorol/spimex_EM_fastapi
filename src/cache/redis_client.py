@@ -9,6 +9,9 @@ from src.models.spimex import SpimexTradingResults
 
 
 class RedisClient:
+    """
+    Клиент для работы с redis
+    """
     def __init__(self, host, port):
         self.host = host
         self.port = port

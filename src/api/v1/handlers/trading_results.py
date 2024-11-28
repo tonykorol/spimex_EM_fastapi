@@ -18,6 +18,13 @@ async def trading_results(
         session: AsyncSession = Depends(get_async_session),
         redis_client: RedisClient = Depends(get_redis_client),
 ):
+    """
+    Получение результатов торгов
+
+    Этот эндпоинт возвращает список результатов торгов по заданным параметрам.
+    Если данные уже кэшированы в Redis, они будут возвращены из кэша.
+    В противном случае данные будут получены из базы данных и кэшированы для последующего использования.
+    """
     result, cache_key = await redis_client.get_cache_or_cache_key(request.method, request.url)
     if result is None:
         result = await get_dynamics(oil_id, delivery_type_id, delivery_basis_id, session)

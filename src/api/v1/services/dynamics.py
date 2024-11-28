@@ -15,7 +15,13 @@ async def get_dynamics(
         start_date: date = None,
         end_date: date = None,
 ) -> List[SpimexTradingResults]:
+    """
+    Получает список торговых результатов на основе заданных параметров.
 
+    Этот метод выполняет запрос к базе данных для получения торговых результатов
+    в указанный период времени и по заданным критериям (идентификаторы нефти,
+    типа доставки и базы доставки).
+    """
     query = (select(SpimexTradingResults).order_by(SpimexTradingResults.date))
 
     if start_date and end_date:

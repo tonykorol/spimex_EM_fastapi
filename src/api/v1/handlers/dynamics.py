@@ -23,6 +23,15 @@ async def dynamics(
         session: AsyncSession = Depends(get_async_session),
         redis_client: RedisClient = Depends(get_redis_client),
 ):
+    """
+        Получает динамику торговых результатов за указанный период.
+
+        Этот эндпоинт возвращает список торговых результатов для заданных параметров
+        (идентификаторы нефти, типа доставки и базы доставки) в указанный период времени.
+
+        Если данные уже кэшированы в Redis, они будут возвращены из кэша.
+        В противном случае данные будут получены из базы данных и кэшированы для последующего использования.
+    """
     if start_date >= end_date:
         raise HTTPException(status_code=400, detail="start_date must be less than end_date")
 
@@ -37,6 +46,5 @@ async def dynamics(
             end_date,
         )
         result = {"results": result}
-
         background_tasks.add_task(update_cache_in_background, redis_client, cache_key, result)
     return result

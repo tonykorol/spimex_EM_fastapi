@@ -19,7 +19,11 @@ async def last_trading_dates(
         redis_client: RedisClient = Depends(get_redis_client),
 ):
     """
-    Get last trading dates
+        Получает последние торговые даты.
+
+        Этот эндпоинт возвращает список последних торговых дат.
+        Если данные уже кэшированы в Redis, они будут возвращены из кэша.
+        В противном случае данные будут получены из базы данных и кэшированы для последующего использования.
     """
     result, cache_key = await redis_client.get_cache_or_cache_key(request.method, request.url)
     if result is None:
