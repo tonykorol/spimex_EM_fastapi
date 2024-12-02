@@ -1,13 +1,23 @@
-from dotenv import load_dotenv
-import os
+from pydantic import ConfigDict
+from pydantic_settings import BaseSettings
 
-load_dotenv()
+class Settings(BaseSettings):
+    MODE: str
 
-DB_NAME = os.environ.get('DB_NAME')
-DB_HOST = os.environ.get('DB_HOST')
-DB_PORT = os.environ.get('DB_PORT')
-DB_USER = os.environ.get('DB_USER')
-DB_PASS = os.environ.get('DB_PASS')
+    DB_NAME: str
+    DB_HOST: str
+    DB_PORT: int
+    DB_USER: str
+    DB_PASS: str
 
-REDIS_HOST = os.environ.get('REDIS_HOST')
-REDIS_PORT = os.environ.get('REDIS_PORT')
+    REDIS_HOST: str
+    REDIS_PORT: int
+
+    model_config = ConfigDict(env_file=".env")
+
+    @property
+    def DB_URL(self) -> str:
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+
+settings = Settings()

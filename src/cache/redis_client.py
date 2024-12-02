@@ -68,8 +68,8 @@ async def update_cache_in_background(redis_client: RedisClient, key: str, data) 
     await redis_client.set_cache(key, data)
 
 
-from src.config import REDIS_HOST, REDIS_PORT
-redis_client = RedisClient(REDIS_HOST, REDIS_PORT)
+from src.config import settings
+redis_client = RedisClient(settings.REDIS_HOST, settings.REDIS_PORT)
 
 async def get_redis_client():
     return redis_client
